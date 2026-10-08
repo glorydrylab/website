@@ -5,14 +5,20 @@
 엑셀 파일 하나와 사진 폴더만 관리하면 됩니다.
 GitHub에 파일을 올리면 1~2분 뒤 홈페이지에 자동으로 반영됩니다.
 
-| 바꾸고 싶은 것 | 고칠 곳 |
-|---|---|
-| 구성원, 논문, 소식, 연혁, 임상시험 목록, 연락처, 홈 화면 문구 | `content/glory-content.xlsx` |
-| 구성원 사진 | `images/people/` 폴더 |
-| 갤러리 사진 | `images/gallery/` 폴더 |
-| 홈 화면 배경 사진 | `images/hero/` 폴더 |
-| Research 페이지 사진 | `images/research/` 폴더 |
-| 소식에 붙는 사진 | `images/news/` 폴더 |
+아래 표의 **폴더 열기** 를 누르면 그 폴더로 들어가고, **올리기** 를 누르면 바로 파일을 끌어다 놓는 화면이 열립니다.
+(올리려면 GitHub에 `glorydrylab` 계정으로 로그인되어 있어야 합니다.)
+
+| 바꾸고 싶은 것 | 고칠 곳 | 바로가기 |
+|---|---|---|
+| 구성원, 논문, 소식, 연혁, 임상시험 목록, 연락처, 홈 화면 문구 | `content/glory-content.xlsx` | [폴더 열기](content) · [엑셀 내려받기](https://github.com/glorydrylab/website/raw/main/content/glory-content.xlsx) · [올리기](https://github.com/glorydrylab/website/upload/main/content) |
+| 구성원 사진 | `images/people/` | [폴더 열기](images/people) · [올리기](https://github.com/glorydrylab/website/upload/main/images/people) |
+| 갤러리 사진 | `images/gallery/` | [폴더 열기](images/gallery) · [올리기](https://github.com/glorydrylab/website/upload/main/images/gallery) |
+| 홈 화면 배경 사진 | `images/hero/` | [폴더 열기](images/hero) · [올리기](https://github.com/glorydrylab/website/upload/main/images/hero) |
+| Research 페이지 사진 | `images/research/` | [폴더 열기](images/research) · [올리기](https://github.com/glorydrylab/website/upload/main/images/research) |
+| 소식에 붙는 사진 | `images/news/` | [폴더 열기](images/news) · [올리기](https://github.com/glorydrylab/website/upload/main/images/news) |
+
+이 안내서 본문에 회색 글씨로 적힌 `images/people/` 같은 경로는 이름만 적어 둔 것이라 눌러도 이동하지 않습니다.
+폴더로 들어가려면 위 표의 바로가기를 쓰거나, 저장소 첫 화면 맨 위의 파일 목록에서 `images` 를 누르세요.
 
 ---
 
