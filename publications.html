@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--title: Publications-->
+<!--desc: Peer-reviewed publications of the GLORY Team: clinical trial reports and translational studies in gynecologic cancer.-->
+<!--#include head-->
+</head>
+<body>
+<!--#include header-->
+
+<main id="main">
+  <div class="container page">
+
+    <header class="page-header">
+      <span class="eyebrow">Research output</span>
+      <h1>Publications</h1>
+      <p>Clinical trial reports and translational studies from the team, with links to the full text.</p>
+    </header>
+
+    <!-- Excel: Publications tab -->
+    <nav class="year-nav" id="js-year-nav" aria-label="Jump to year"></nav>
+    <section class="stats-panel" id="js-pub-stats" aria-label="Publication statistics"></section>
+    <section class="filter-panel" aria-label="Filter publications">
+      <div><label for="f-search">Search</label><input id="f-search" type="search" placeholder="Title, author or journal" autocomplete="off"></div>
+      <div><label for="f-year">Year</label><select id="f-year"><option value="all">All years</option></select></div>
+      <div><label for="f-category">Category</label><select id="f-category"><option value="all">All categories</option><option value="clinical">Clinical</option><option value="translational">Translational</option></select></div>
+    </section>
+    <p class="filter-count" id="js-pub-count" aria-live="polite"></p>
+    <div id="js-publications"></div>
+    <div id="js-scholar"></div>
+
+  </div>
+</main>
+
+<!--#include footer-->
+</body>
+</html>
