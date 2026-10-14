@@ -11,11 +11,17 @@
       <a class="nav-link" data-nav="gallery" href="gallery.html">Gallery</a>
       <a class="nav-link" data-nav="contact" href="contact.html">Contact</a>
     </div>
-    <button class="menu-button" type="button" aria-expanded="false" aria-controls="mobile-nav">
-      <span class="sr-only">Open main menu</span>
-      <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
+    <div class="nav-actions">
+      <!-- Language switch (EN / KO). Korean text lives in assets/js/i18n-ko.js -->
+      <button class="lang-toggle" type="button" data-lang-toggle aria-label="한국어로 보기">
+        <span class="lang-opt" data-lang-opt="en">EN</span><span class="lang-opt" data-lang-opt="ko">KO</span>
+      </button>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="mobile-nav">
+        <span class="sr-only">Open main menu</span>
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
   </div>
 </nav>
 <!-- kept outside <nav class="site-nav">: its blur effect would trap a full-screen menu inside the bar -->

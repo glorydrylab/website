@@ -9,6 +9,51 @@
   var D = window.SITE_DATA || {};
   var S = D.settings || {};
 
+  /* ------------------------------------------------- language (EN / KO) */
+  /* Korean text: assets/js/i18n-ko.js. Choice is remembered in the browser; ?lang=ko or ?lang=en also works. */
+  var KO = window.I18N_KO || {};
+  var LANG = "en";
+  try {
+    var qLang = new URLSearchParams(location.search).get("lang");
+    if (qLang === "ko" || qLang === "en") { LANG = qLang; localStorage.setItem("glory-lang", qLang); }
+    else if (localStorage.getItem("glory-lang") === "ko") LANG = "ko";
+  } catch (e) { /* storage blocked: stay in English */ }
+  var isKo = LANG === "ko";
+  document.documentElement.lang = LANG;
+  function T(en) { return isKo && KO[en] ? KO[en] : en; }
+  var MONTH_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var DATE_RE = new RegExp("^(" + MONTH_EN.join("|") + ")(?: (\\d{1,2}),)? (\\d{4})$");
+  var COPY_RE = /^© (\d{4}) (.+?)\. All rights reserved\. This site provides information about the research team and is not medical advice\.$/;
+  function translateText(t) {
+    if (KO[t]) return KO[t];
+    var m = DATE_RE.exec(t);
+    if (m) return m[3] + "년 " + (MONTH_EN.indexOf(m[1]) + 1) + "월" + (m[2] ? " " + m[2] + "일" : "");
+    m = COPY_RE.exec(t);
+    if (m) return "© " + m[1] + " " + m[2] + ". 이 사이트는 연구팀 소개를 위한 것으로, 의학적 조언을 제공하지 않습니다.";
+    return null;
+  }
+  /* Replace every English text node / label under root that has a Korean version */
+  function translateTree(root) {
+    if (!isKo || !root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var node;
+    while ((node = walker.nextNode())) {
+      var parent = node.parentNode;
+      if (!parent || /^(SCRIPT|STYLE)$/.test(parent.nodeName)) continue;
+      var raw = node.nodeValue, t = raw.trim();
+      if (!t) continue;
+      var ko = translateText(t);
+      if (ko) node.nodeValue = raw.replace(t, ko);
+    }
+    root.querySelectorAll("[placeholder], [aria-label], [alt]").forEach(function (el) {
+      ["placeholder", "aria-label", "alt"].forEach(function (a) {
+        var v = el.getAttribute(a);
+        if (v && KO[v.trim()]) el.setAttribute(a, KO[v.trim()]);
+      });
+    });
+  }
+  function countLabel(n, en, ko) { return isKo ? n + ko : plural(n, en); }
+
   function $(id) { return document.getElementById(id); }
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
@@ -33,10 +78,11 @@
 
   /* ---------------------------------------------- text from Settings tab */
   document.querySelectorAll("[data-s]").forEach(function (el) {
-    var v = S[el.getAttribute("data-s")];
+    var key = el.getAttribute("data-s");
+    var v = (isKo && S[key + "_ko"]) || S[key];
     if (v) el.textContent = v;
   });
-  if ($("js-updated") && D.built) $("js-updated").textContent = "Last updated " + D.built;
+  if ($("js-updated") && D.built) $("js-updated").textContent = T("Last updated") + " " + D.built;
 
   /* --------------------------------------------------------- mobile menu */
   var menuBtn = document.querySelector(".menu-button");
@@ -93,7 +139,7 @@
     lightbox.className = "lightbox";
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
-    lightbox.setAttribute("aria-label", "Photo viewer");
+    lightbox.setAttribute("aria-label", T("Photo viewer"));
     lightbox.innerHTML =
       '<button class="lightbox-btn lightbox-close" type="button" aria-label="Close">' + CLOSE + "</button>" +
       '<button class="lightbox-btn lightbox-prev" type="button" aria-label="Previous photo">' + ARROW_L + "</button>" +
@@ -101,6 +147,7 @@
       '<button class="lightbox-btn lightbox-next" type="button" aria-label="Next photo">' + ARROW_R + "</button>" +
       '<p class="lightbox-caption"></p>';
     document.body.appendChild(lightbox);
+    translateTree(lightbox);
     lightbox.querySelector(".lightbox-close").addEventListener("click", closeLightbox);
     lightbox.querySelector(".lightbox-prev").addEventListener("click", function () { showPhoto(lbIndex - 1); });
     lightbox.querySelector(".lightbox-next").addEventListener("click", function () { showPhoto(lbIndex + 1); });
@@ -146,7 +193,7 @@
     if (lbOpener) lbOpener.focus();
   }
   function photoButton(p, i) {
-    return '<button class="photo" type="button" data-photo="' + i + '" aria-label="' + esc(p.caption || "Open photo " + (i + 1)) + '">' +
+    return '<button class="photo" type="button" data-photo="' + i + '" aria-label="' + esc(p.caption || (isKo ? "사진 " + (i + 1) + " 열기" : "Open photo " + (i + 1))) + '">' +
       '<img src="' + esc(p.thumb) + '" alt="' + esc(p.caption || "") + '" loading="lazy"' +
       (p.w ? ' width="' + p.w + '" height="' + p.h + '"' : "") + ">" +
       (p.caption ? '<span class="photo-caption">' + esc(p.caption) + "</span>" : "") + "</button>";
@@ -212,7 +259,7 @@
         ? '<button class="pub-arrow pub-arrow--prev" type="button" aria-label="Previous publication">' + ARROW_L + "</button>" +
           '<button class="pub-arrow pub-arrow--next" type="button" aria-label="Next publication">' + ARROW_R + "</button>" +
           '<div class="pub-dots">' + featured.map(function (_, i) {
-            return '<button class="pub-dot" type="button" aria-label="Publication ' + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : "") + "></button>";
+            return '<button class="pub-dot" type="button" aria-label="' + (isKo ? "논문 " : "Publication ") + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : "") + "></button>";
           }).join("") + "</div>"
         : "");
       var slides = slider.querySelectorAll(".pub-slide");
@@ -372,7 +419,9 @@
         if (q && (p.title + " " + p.authors + " " + p.journal).toLowerCase().indexOf(q) < 0) return false;
         return true;
       });
-      $("js-pub-count").textContent = "Showing " + plural(list.length, "publication") + (list.length !== all.length ? " of " + all.length : "");
+      $("js-pub-count").textContent = isKo
+        ? (list.length !== all.length ? "전체 " + all.length + "편 중 " : "") + list.length + "편"
+        : "Showing " + plural(list.length, "publication") + (list.length !== all.length ? " of " + all.length : "");
       var shownYears = [];
       list.forEach(function (p) { if (shownYears.indexOf(p.year) < 0) shownYears.push(p.year); });
       $("js-publications").innerHTML = list.length ? shownYears.map(function (y) {
@@ -386,6 +435,7 @@
         return '<a href="#y' + esc(y) + '">' + esc(y) + "<small>(" + n + ")</small></a>";
       }).join("");
       nav.classList.toggle("is-ready", shownYears.length > 2);
+      translateTree($("js-publications")); translateTree(nav);
     };
     fYear.addEventListener("change", renderPubs);
     fCat.addEventListener("change", renderPubs);
@@ -412,10 +462,11 @@
     var active = "all";
     var renderNews = function () {
       var list = news.filter(function (n) { return active === "all" || n.category === active; });
-      $("js-news-count").textContent = plural(list.length, "item");
+      $("js-news-count").textContent = countLabel(list.length, "item", "건");
       $("js-news").innerHTML = list.length
         ? list.map(function (n) { return newsCard(n, false); }).join("")
         : '<p class="empty" style="grid-column:1/-1">No news yet.</p>';
+      translateTree($("js-news"));
     };
     var bar = $("js-news-filter");
     if (cats.length > 1) {
@@ -444,7 +495,7 @@
       var offset = 0;
       $("js-gallery").innerHTML = albums.map(function (a) {
         var html = '<section class="album" data-reveal><div class="album-head"><h2>' + esc(a.title) + "</h2>" +
-          '<span class="album-meta">' + (a.date ? esc(a.date) + " · " : "") + plural(a.photos.length, "photo") + "</span></div>" +
+          '<span class="album-meta">' + (a.date ? esc((isKo && translateText(a.date)) || a.date) + " · " : "") + countLabel(a.photos.length, "photo", "장") + "</span></div>" +
           '<div class="photo-grid">' + a.photos.map(function (p, i) { return photoButton(p, offset + i); }).join("") + "</div></section>";
         offset += a.photos.length;
         return html;
@@ -477,13 +528,40 @@
       if (!navigator.clipboard) { copy.hidden = true; return; }
       copy.addEventListener("click", function () {
         navigator.clipboard.writeText(copy.getAttribute("data-copy")).then(function () {
-          copy.textContent = "Copied"; copy.classList.add("is-copied");
-          setTimeout(function () { copy.textContent = "Copy"; copy.classList.remove("is-copied"); }, 1800);
+          copy.textContent = T("Copied"); copy.classList.add("is-copied");
+          setTimeout(function () { copy.textContent = T("Copy"); copy.classList.remove("is-copied"); }, 1800);
         });
       });
     });
     if ($("js-map-google") && safeUrl(S.map_url)) $("js-map-google").href = S.map_url;
   }
+
+  /* ---------------------------------------------- PhD recruitment emails */
+  if ($("js-phd-emails")) {
+    var phdMails = S.phd_email ? String(S.phd_email).split(/[\s,;]+/).filter(function (e) { return e.indexOf("@") > 0; }) : emails();
+    $("js-phd-emails").innerHTML = phdMails.map(function (e) {
+      return '<li><a href="mailto:' + esc(e) + '?subject=' + encodeURIComponent(isKo ? "박사과정 지원 - " : "PhD application - ") + '">' + esc(e) + "</a></li>";
+    }).join("");
+    if (!phdMails.length) $("phd").querySelectorAll(".recruit-label")[1].hidden = true;
+  }
+
+  /* ------------------------------------------------- apply language + switch */
+  if (isKo) {
+    translateTree(document.body);
+    var parts = document.title.split(" | ");
+    parts[0] = T(parts[0]);
+    document.title = parts.join(" | ");
+  }
+  document.querySelectorAll("[data-lang-toggle]").forEach(function (btn) {
+    btn.setAttribute("aria-label", isKo ? "View in English" : "한국어로 보기");
+    btn.addEventListener("click", function () {
+      var next = isKo ? "en" : "ko";
+      try { localStorage.setItem("glory-lang", next); } catch (e) { /* ignore */ }
+      var url = new URL(location.href);
+      url.searchParams.set("lang", next);
+      location.replace(url.toString());
+    });
+  });
 
   /* ------------------------------------------------------- scroll reveal */
   var targets = document.querySelectorAll("[data-reveal]");
